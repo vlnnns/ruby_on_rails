@@ -1,0 +1,22 @@
+# Ignore IDE settings
+.idea/
+
+# Ignore OS files
+.DS_Store
+
+# Ignore log and temp files
+*.log
+*.tmp
+
+# Ignore Ruby/Rails specific files
+*.gem
+*.rbc
+.bundle
+vendor/bundle
+
+# Ignore node modules if used
+node_modules/
+
+# Ignore environment files
+.env
+
