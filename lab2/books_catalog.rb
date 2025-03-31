@@ -1,63 +1,65 @@
 require 'json'
 require 'yaml'
 
-catalog = []
+catalog = {}
 
 def add_book(catalog)
   print 'Book name: '
-  title = gets.chomp
+  title = gets.chomp.to_sym
 
-  print 'Authors '
+  print 'Authors: '
   authors = gets.chomp.split(',').map(&:strip)
 
-  print 'Genres '
+  print 'Genres: '
   genres = gets.chomp.split(',').map(&:strip)
 
-  catalog << { title: title, authors: authors, genres: genres }
+  catalog[title] = { authors: authors, genres: genres }
 end
 
 def edit_book(catalog)
-  print 'Enter book name'
-  name = gets.chomp
+  print 'Enter book name: '
+  name = gets.chomp.to_sym
 
-  book = catalog.find { |b| b[:title] == name }
-  if book
+  if catalog.key?(name)
     print 'Enter new name (or leave empty to not change): '
-    new_title = gets.chomp
-    book[:title] = new_title unless new_title.empty?
+    new_title = gets.chomp.to_sym
+
+    unless new_title.empty?
+      catalog[new_title] = catalog.delete(name)
+      name = new_title
+    end
 
     print 'Enter new authors (comma-separated, or leave empty to not change): '
     new_authors = gets.chomp
-    book[:authors] = new_authors.split(',').map(&:strip) unless new_authors.empty?
+    catalog[name][:authors] = new_authors.split(',').map(&:strip) unless new_authors.empty?
 
     print 'Enter new genres (comma-separated, or leave empty to not change): '
     new_genres = gets.chomp
-    book[:genres] = new_genres.split(',').map(&:strip) unless new_genres.empty?
+    catalog[name][:genres] = new_genres.split(',').map(&:strip) unless new_genres.empty?
   else
-    puts 'Book is not found'
+    puts 'Book not found'
   end
 end
 
 def delete_book(catalog)
-  print 'Enter book name to delete:'
-  name = gets.chomp
-
-  catalog.reject! { |b| b[:title] == name }
+  print 'Enter book name to delete: '
+  name = gets.chomp.to_sym
+  catalog.delete(name) || puts('Book not found')
 end
 
 def search_book(catalog)
-  print 'What we are searching for: '
+  print 'What are we searching for: '
   query = gets.chomp.downcase
 
-  results = catalog.select do |b|
-    b[:title].downcase.include?(query) ||
-      b[:authors].any? { |a| a.downcase.include?(query) } ||
-      b[:genres].any? { |g| g.downcase.include?(query) }
+  results = catalog.select do |title, details|
+    title.to_s.downcase.include?(query) ||
+      details[:authors].any? { |a| a.downcase.include?(query) } ||
+      details[:genres].any? { |g| g.downcase.include?(query) }
   end
 
-  puts "Founded #{results.size} books:"
-  results.each do |book|
-    puts "Name: #{book[:title]}, Authors: #{book[:authors].join(", ")}, Genres: #{book[:genres].join(", ")}"
+  puts "Found #{results.size} books:"
+  results.each do |title, details|
+    puts "Name: #{title}, Authors: #{details[:authors].join(', ')}, Genres: #{details[:genres].join(', ')}"
   end
 end
 
@@ -79,11 +81,11 @@ def load_from_file(format)
 
   case format
   when :json
-    JSON.parse(File.read("#{filename}.json"), symbolize_names: true)
+    JSON.parse(File.read("#{filename}.json"), symbolize_names: true) rescue {}
   when :yaml
-    YAML.load_file("#{filename}.yml")
+    YAML.load_file("#{filename}.yml", symbolize_names: true) rescue {}
   else
-    []
+    {}
   end
 end
 
