@@ -1,7 +1,6 @@
 require 'json'
 require 'yaml'
 
-books = {}
 
 def add_book(collection, title, authors, genres)
   collection[title.to_sym] = { authors: authors, genres: genres }
