@@ -75,19 +75,18 @@ def save_to_file(catalog, format)
   end
 end
 
-def load_from_file(format)
-  print 'Name of file to load (without extension): '
-  filename = gets.chomp
-
-  case format
-  when :json
-    JSON.parse(File.read("#{filename}.json"), symbolize_names: true) rescue {}
-  when :yaml
-    YAML.load_file("#{filename}.yml", symbolize_names: true) rescue {}
-  else
-    {}
+def output_books(collection)
+  collection.each do |title, details|
+    puts "\nTitle: #{title}"
+    puts "Authors: #{details[:authors].join(', ')}"
+    puts "Genres: #{details[:genres].join(', ')}"
   end
 end
+
+def show(catalog)
+  output_books(catalog)
+end
+
 
 loop do
   puts "\n1. Add book"
@@ -96,9 +95,8 @@ loop do
   puts '4. Search book'
   puts '5. Save to JSON'
   puts '6. Save to YAML'
-  puts '7. Load from JSON'
-  puts '8. Load from YAML'
-  puts '9. Exit'
+  puts '7. Show catalog'
+  puts '8. Exit'
   print 'Choose an option: '
 
   case gets.to_i
@@ -108,9 +106,8 @@ loop do
   when 4 then search_book(catalog)
   when 5 then save_to_file(catalog, :json)
   when 6 then save_to_file(catalog, :yaml)
-  when 7 then catalog = load_from_file(:json)
-  when 8 then catalog = load_from_file(:yaml)
-  when 9 then break
+  when 7 then show(catalog)
+  when 8 then break
   else puts 'Incorrect choice'
   end
 end
