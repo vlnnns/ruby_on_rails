@@ -1,5 +1,44 @@
+<% if current_user %>
+  <div class="mb-4">
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deleteAccountForm" aria-expanded="false" aria-controls="deleteAccountForm">
+      🗑️ Видалити акаунт
+    </button>
+
+    <div class="collapse mt-3" id="deleteAccountForm">
+      <div class="card card-body border-danger">
+        <%= form_with url: account_path, method: :delete, local: true do %>
+          <div class="mb-3">
+            <%= label_tag :password, "Введіть пароль для підтвердження", class: "form-label" %>
+            <%= password_field_tag :password, nil, class: "form-control", required: true %>
+          </div>
+          <%= submit_tag "Підтвердити видалення", class: "btn btn-danger" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <h1 class="mb-4">Books</h1>
 <%= link_to 'New book', new_book_path, class: 'btn btn-success mb-3' %>
+
+<%= form_with url: books_path, method: :get, local: true, class: "row g-3 mb-4" do %>
+  <div class="col-md-3">
+    <%= label_tag :title, "Назва книги", class: "form-label" %>
+    <%= text_field_tag :title, params[:title], class: "form-control" %>
+  </div>
+  <div class="col-md-3">
+    <%= label_tag :author, "Автор", class: "form-label" %>
+    <%= text_field_tag :author, params[:author], class: "form-control" %>
+  </div>
+  <div class="col-md-3">
+    <%= label_tag :genre, "Жанр", class: "form-label" %>
+    <%= text_field_tag :genre, params[:genre], class: "form-control" %>
+  </div>
+  <div class="col-md-auto align-self-end">
+    <%= submit_tag "Пошук", class: "btn btn-primary" %>
+  </div>
+<% end %>
+
 
 <table class="table table-striped">
   <thead>
@@ -12,6 +51,7 @@
   </thead>
   <tbody>
   <% @books.each do |book| %>
+
     <tr>
       <td><%= book.title %></td>
       <td><%= book.authors.map(&:name).join(', ') %></td>
@@ -28,3 +68,8 @@
   <% end %>
   </tbody>
 </table>
+
+<% if @books.empty? %>
+  <div class="alert alert-warning">Книг не знайдено за обраними параметрами.</div>
+<% end %>
+
