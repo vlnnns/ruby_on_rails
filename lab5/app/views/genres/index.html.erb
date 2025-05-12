@@ -1,0 +1,8 @@
+<%= link_to "← Go Back", root_path, class: "btn btn-outline-primary mb-3" %>
+
+<h1>Genres</h1>
+<ul>
+  <% @genres.each do |genre| %>
+    <li><%= link_to genre.name, genre_path(genre) %></li>
+  <% end %>
+</ul>

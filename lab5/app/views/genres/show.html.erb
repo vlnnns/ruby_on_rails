@@ -1,0 +1,10 @@
+<%= link_to "← Go Back", genres_path, class: "btn btn-outline-secondary mb-3" %>
+
+<h1><%= @genre.name %></h1>
+
+<h3>Books of this genre:</h3>
+<ul>
+  <% @books.each do |book| %>
+    <li><%= link_to book.title, book_path(book) %></li>
+  <% end %>
+</ul>

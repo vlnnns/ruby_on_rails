@@ -18,7 +18,11 @@
   </div>
 <% end %>
 
-<h1 class="mb-4">Books</h1>
+<nav class="mb-4">
+  <%= link_to 'Books', books_path, class: "btn btn-outline-dark me-2" %>
+  <%= link_to 'Authors', authors_path, class: "btn btn-outline-dark me-2" %>
+  <%= link_to 'Genres', genres_path, class: "btn btn-outline-dark" %>
+</nav>
 <%= link_to 'New book', new_book_path, class: 'btn btn-success mb-3' %>
 
 <%= form_with url: books_path, method: :get, local: true, class: "row g-3 mb-4" do %>

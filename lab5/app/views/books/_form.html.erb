@@ -16,23 +16,79 @@
 
   <div class="mb-3">
     <%= label_tag :author_names, "Authors (comma separated)" %>
-    <%= text_field_tag :author_names, @book.authors.map(&:name).join(", "), list: "author-list", class: "form-control" %>
-    <datalist id="author-list">
-      <% Author.pluck(:name).uniq.each do |name| %>
-        <option value="<%= name %>">
-      <% end %>
-    </datalist>
+    <%= text_field_tag :author_names, @book.authors.map(&:name).join(", "), class: "form-control", id: "author-input", autocomplete: "off" %>
+    <ul id="author-suggestions" class="autocomplete-list"></ul>
   </div>
 
   <div class="mb-3">
     <%= label_tag :genre_names, "Genres (comma separated)" %>
-    <%= text_field_tag :genre_names, @book.genres.map(&:name).join(", "), list: "genre-list", class: "form-control" %>
-    <datalist id="genre-list">
-      <% Genre.pluck(:name).uniq.each do |name| %>
-        <option value="<%= name %>">
-      <% end %>
-    </datalist>
+    <%= text_field_tag :genre_names, @book.genres.map(&:name).join(", "), class: "form-control", id: "genre-input", autocomplete: "off" %>
+    <ul id="genre-suggestions" class="autocomplete-list"></ul>
   </div>
+  <style>
+      .autocomplete-list {
+          position: absolute;
+          background: #fff;
+          border: 1px solid #ccc;
+          list-style: none;
+          padding: 0;
+          margin: 2px 0 0;
+          z-index: 1000;
+          max-height: 150px;
+          overflow-y: auto;
+          width: 100%;
+      }
+      .autocomplete-list li {
+          padding: 5px 10px;
+          cursor: pointer;
+      }
+      .autocomplete-list li:hover {
+          background-color: #f0f0f0;
+      }
+  </style>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const authors = <%= raw Author.pluck(:name).uniq.to_json %>;
+          const genres  = <%= raw Genre.pluck(:name).uniq.to_json %>;
+
+          setupAutocomplete("author-input", "author-suggestions", authors);
+          setupAutocomplete("genre-input", "genre-suggestions", genres);
+      });
+
+      function setupAutocomplete(inputId, listId, items) {
+          const input = document.getElementById(inputId);
+          const list = document.getElementById(listId);
+
+          input.addEventListener("input", () => {
+              const terms = input.value.split(",").map(t => t.trim());
+              const last = terms[terms.length - 1].toLowerCase();
+              list.innerHTML = "";
+
+              if (last.length === 0) return;
+
+              const filtered = items.filter(item => item.toLowerCase().startsWith(last)).slice(0, 5);
+              filtered.forEach(match => {
+                  const li = document.createElement("li");
+                  li.textContent = match;
+                  li.addEventListener("click", () => {
+                      terms[terms.length - 1] = match;
+                      input.value = terms.join(", ") + ", ";
+                      list.innerHTML = "";
+                  });
+                  list.appendChild(li);
+              });
+
+              list.style.display = filtered.length > 0 ? "block" : "none";
+          });
+
+          document.addEventListener("click", e => {
+              if (!input.contains(e.target) && !list.contains(e.target)) {
+                  list.innerHTML = "";
+              }
+          });
+      }
+  </script>
+
 
 
   <%= f.submit 'Save', class: "btn btn-primary" %>

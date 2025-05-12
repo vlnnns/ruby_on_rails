@@ -1,0 +1,10 @@
+<%= link_to "← Go Back", authors_path, class: "btn btn-outline-secondary mb-3" %>
+
+<h1><%= @author.name %></h1>
+
+<h3>Books of this author</h3>
+<ul>
+  <% @books.each do |book| %>
+    <li><%= link_to book.title, book_path(book) %></li>
+  <% end %>
+</ul>
